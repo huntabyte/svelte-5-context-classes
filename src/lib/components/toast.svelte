@@ -1,12 +1,14 @@
 <script lang="ts">
 	import type { Toast } from '$lib/types';
 	import X from 'phosphor-svelte/lib/X';
+	import { getToastState } from '$lib/toast-state.svelte';
 
 	type Props = {
 		toast: Toast;
 	};
 
 	let { toast }: Props = $props();
+	const toastState = getToastState();
 </script>
 
 <div
@@ -14,7 +16,7 @@
 >
 	<span class="text-sm font-medium">{toast.title}</span>
 	<span class="text-xs">{toast.message}</span>
-	<button class="absolute right-2 top-2 size-5">
+	<button class="absolute right-2 top-2 size-5" onclick={() => toastState.remove(toast.id)}>
 		<span class="sr-only">Close toast</span>
 		<X class="size-4" />
 	</button>
