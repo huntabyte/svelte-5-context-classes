@@ -41,6 +41,30 @@ SvelteKit now supports SSE natively, as demonstrated in [ReadableStream for SSE]
 
 This pattern is already encapsulated by [sveltekit-sse](https://github.com/razshare/sveltekit-sse) library which makes using SSE much easier!
 
+## Flow pattern
+
+The basic flow can be described as follows:
+
+1. A Redis pubsub channel with application CRUD events for projects
+2. A store subscribes to the pubsub channel and updates messages in the store.
+3. An API subscribes to the store and publishes messages as SSE.
+4. A Client pages listens to the SSE and updates the page.
+
+```mermaid
+graph LR
+    A[Redis PubSub Channel] <-- subscribes --- B[Store]
+    B <-- subscribes --- C[API]
+    C -- publishes SSE --> D[Client Page]
+
+    style A fill:#ff9999,stroke:#333,stroke-width:2px
+    style B fill:#99ff99,stroke:#333,stroke-width:2px
+    style C fill:#9999ff,stroke:#333,stroke-width:2px
+    style D fill:#ffff99,stroke:#333,stroke-width:2px
+
+    B -->|Updates| B
+    D -->|Updates| D
+```
+
 ## TODO
 
 1. Make the polling page work.
