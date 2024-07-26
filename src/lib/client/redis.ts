@@ -1,5 +1,4 @@
-// import Redis from 'ioredis';
-import RedisMock from 'ioredis-mock';
+import RedisMock from 'ioredis-mock/browser';
 // import { createRedisStore } from '$lib/stores/redis-store';
 import { RedisStore } from '$lib/stores/redis-rune-store.svelte';
 

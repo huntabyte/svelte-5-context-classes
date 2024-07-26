@@ -1,21 +1,20 @@
 import type { Redis } from 'ioredis';
 
+export type subscribeFn = (value: string[], message: string) => void;
+
 export class RedisStore {
 	private pubsub: Redis;
 	private channel: string;
 	private isConnected = false;
 	private messages = $state<string[]>([]);
+	private callback?: subscribeFn;
 
 	constructor(pubsub: Redis, channel: string) {
 		this.pubsub = pubsub;
 		this.channel = channel;
-
-		$effect(() => {
-			this.connectAndSubscribe();
-		});
 	}
 
-	private async connectAndSubscribe() {
+	async connectAndSubscribe() {
 		if (this.isConnected) {
 			console.log('Already connected to pubsub');
 			return;
@@ -32,6 +31,9 @@ export class RedisStore {
 			this.pubsub.on('message', (receivedChannel: string, message: string) => {
 				if (receivedChannel === this.channel) {
 					this.messages = [...this.messages, message];
+					if (this.callback) {
+						this.callback(this.messages, message);
+					}
 				}
 			});
 		} catch (error) {
@@ -40,10 +42,8 @@ export class RedisStore {
 		}
 	}
 
-	public subscribe(callback: (value: string[]) => void) {
-		return $effect(() => {
-			callback(this.messages);
-		});
+	public subscribe(callback: subscribeFn) {
+		this.callback = callback;
 	}
 
 	public unsubscribe() {

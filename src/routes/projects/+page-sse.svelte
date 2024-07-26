@@ -5,21 +5,28 @@
 	export let channelName = 'default';
 
 	let messages: string[] = [];
-	let intervalId: any;
+	let eventSource: EventSource | null = null;
 
-	async function fetchMessages() {
-		const response = await fetch(`/api/messages?channel=${channelName}`);
-		const data = await response.json();
-		messageStore.set(data.messages);
+	function connectToSSE() {
+		eventSource = new EventSource(`/api/sse?channel=${channelName}`);
+
+		eventSource.onmessage = (event) => {
+			const data = JSON.parse(event.data);
+			messageStore.set(data.messages);
+		};
+
+		eventSource.onerror = () => {
+			console.error('Error with the SSE connection.');
+			eventSource?.close();
+		};
 	}
 
 	onMount(() => {
-		fetchMessages();
-		intervalId = setInterval(fetchMessages, 5000); // Poll every 5 seconds
+		connectToSSE();
 	});
 
 	onDestroy(() => {
-		if (intervalId) clearInterval(intervalId);
+		eventSource?.close();
 		messageStore.reset();
 	});
 

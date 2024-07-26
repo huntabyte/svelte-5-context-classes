@@ -1,8 +1,26 @@
 # Ai Dev Team
 
-Each page listens to a Redis pubsub powered store. On receiving application events on the channel, the page should update real-time.
+The goal is for each page to listen to a Redis (pubsub) store for that page.
+On receiving application events on the channel, the page should update in real-time.
+The Redis store is currently server side.
 
 Currently `ioredis-mock` is used to substitute a real Redis database with an in-memory mock solution, ideal for testing.
+
+ioredis has [experimental support for browser usage](https://www.npmjs.com/package/ioredis-mock#browser-usage-experimental)
+
+```js
+import Redis from 'https://unpkg.com/ioredis-mock';
+
+const redis = new Redis();
+redis.set('foo', 'bar');
+console.log(await redis.get('foo'));
+```
+
+However, the redis messages should ideally be shared via SSE (Server Side Events) or Websockets.
+
+The API includes support for both a polling solution (GET request every 5 secs) and SSEs via ReadableStream.
+
+See `/projects` folder with examples of client page implementations using both of these approaches.
 
 ## Creating a project
 
