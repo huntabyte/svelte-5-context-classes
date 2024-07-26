@@ -4,8 +4,7 @@
 
 	let { channelName } = $props();
 
-	// TODO: get id from path
-	const teamStore = createTeamStore('id');
+	const teamStore = createTeamStore();
 
 	let messages = $state<string[]>([]);
 
@@ -22,6 +21,7 @@
 </script>
 
 <div>
+	<h1>Project teams</h1>
 	<h2>{channelName} Messages</h2>
 	{#if messages.length === 0}
 		<p>No messages yet.</p>

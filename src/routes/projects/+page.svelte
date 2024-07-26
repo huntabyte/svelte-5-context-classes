@@ -21,6 +21,7 @@
 </script>
 
 <div>
+	<h1>Projects</h1>
 	<h2>{channelName} Messages</h2>
 	{#if messages.length === 0}
 		<p>No messages yet.</p>

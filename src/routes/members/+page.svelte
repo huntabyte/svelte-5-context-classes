@@ -1,26 +1,27 @@
 <script lang="ts">
-	import { createTeamStore } from '$lib/server/redis';
+	import { createMemberStore } from '$lib/server/redis';
 	import { onDestroy } from 'svelte';
 
 	let { channelName } = $props();
 
-	const teamStore = createTeamStore();
+	const memberStore = createMemberStore();
 
 	let messages = $state<string[]>([]);
 
 	$effect(() => {
-		teamStore.subscribe((value) => {
+		memberStore.subscribe((value) => {
 			messages = value;
 		});
 
 		onDestroy(() => {
-			teamStore.reset();
-			teamStore.unsubscribe();
+			memberStore.reset();
+			memberStore.unsubscribe();
 		});
 	});
 </script>
 
 <div>
+	<h1>Members</h1>
 	<h2>{channelName} Messages</h2>
 	{#if messages.length === 0}
 		<p>No messages yet.</p>

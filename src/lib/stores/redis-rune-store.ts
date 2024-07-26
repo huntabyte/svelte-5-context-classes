@@ -16,9 +16,13 @@ export class RedisStore {
 	}
 
 	private async connectAndSubscribe() {
-		if (this.isConnected) return;
+		if (this.isConnected) {
+			console.log('Already connected to pubsub');
+			return;
+		}
 
 		try {
+			console.log('Connecting to pubsub');
 			await this.pubsub.connect();
 			this.isConnected = true;
 
