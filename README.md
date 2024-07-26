@@ -22,6 +22,86 @@ The API includes support for both a polling solution (GET request every 5 secs) 
 
 See `/projects` folder with examples of client page implementations using both of these approaches.
 
+SvelteKit now supports SSE natively, as demonstrated in [ReadableStream for SSE](https://github.com/sveltejs/kit/issues/5344#issuecomment-1266398131) and [Full example](https://github.com/sveltejs/kit/issues/5344#issuecomment-2191106238)
+
+This pattern is already encapsulated by [sveltekit-sse](https://github.com/razshare/sveltekit-sse) library which makes using SSE much easier!
+
+## Design
+
+Currently the project includes a simple Toast component. This component should be used to display (relevant) incoming messages (SSEs) on each page, which trigger updates to the underlying data model. In the future these events should also be subscribed to by a database "agent" which updates a database (f.ex using Drizzle ORM)
+
+## Pages
+
+- /account
+- /dashboard
+- /projects
+- /projects/:id
+- /projects/:id/teams
+- /projects/:id/teams/:id
+- /members
+- /members/:id
+
+## Architecture
+
+When the basic communication infra is working, we need to setup basic CRUD messages to be communicated.
+
+### Domain model and CRUD messages
+
+An account belongs to an Organization.
+
+### Organization
+
+- Projects
+- Members
+
+Events:
+
+- Create Project
+- Delete Project
+- Update Project
+
+- Create Member
+- Delete Member
+- Update Member
+
+#### Project
+
+Each project can have
+
+- Project Teams
+- Project Backlog
+
+Events:
+
+- Create Team
+- Delete Team
+- Update Team
+
+#### Team
+
+Each team can have members from the organization assigned. Project backlog items can be assigned to a given team (backlog).
+The items can then each be assigned to member(s)? to be worked on.
+
+- Team Members
+- Team Backlog
+
+#### Member
+
+Each member can work on tasks
+
+#### Backlog
+
+- Epic that can have features
+- Feature that can have tasks
+- Task where work is performed by the member (via AI agent using LLM)
+
+## Project infra
+
+This project is a PNPM project, so use:
+
+- `pnpm run dev` to run dev server
+- `pnpm add` to install dependencies
+
 ## Creating a project
 
 If you're seeing this, you've probably already done this step. Congrats!
