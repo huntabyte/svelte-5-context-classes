@@ -4,9 +4,15 @@ The goal is for each page to listen to a Redis (pubsub) store for that page.
 On receiving application events on the channel, the page should update in real-time.
 The Redis store is currently server side.
 
+## Redis pubsub
+
+The project uses Redis pubsub (see `src/lib/server/redis`) using `RedisMock` as in-memory Redis.
+
 Currently `ioredis-mock` is used to substitute a real Redis database with an in-memory mock solution, ideal for testing.
 
-ioredis has [experimental support for browser usage](https://www.npmjs.com/package/ioredis-mock#browser-usage-experimental)
+`ioredis-mock` has [experimental support for browser usage](https://www.npmjs.com/package/ioredis-mock#browser-usage-experimental)
+
+As in this example:
 
 ```js
 import Redis from 'https://unpkg.com/ioredis-mock';
@@ -17,14 +23,68 @@ console.log(await redis.get('foo'));
 ```
 
 However, the redis messages should ideally be shared via SSE (Server Side Events) or Websockets.
+To communicate the messages of the `RedisStore` (in `redis-rune-store.svelte.ts`) to the client, we need an API with real-time events to act as the bridge.
+
+## API
 
 The API includes support for both a polling solution (GET request every 5 secs) and SSEs via ReadableStream.
 
-See `/projects` folder with examples of client page implementations using both of these approaches.
+- `routes/api/messages/+server.ts` - simple GET endpoint that can be used for polling. Subscribes to store and sends messages received back as response
+- `routes/api/sse/+server.ts` - subscribes to store and sends received messages back as a `ReadableStream` (SSE)
+
+See `routes/projects` folder with examples of client page implementations using both of these approaches.
+
+- `routes/projects/page-sse.svelte` project client page that sets up an `EventSource` to listen to the SSE from the server and handle and display incoming project events
+- `routes/projects/page.svelte` project client page that uses polling to call the GET endpoint every 5 secs to retrieve new project events (messages) to display
 
 SvelteKit now supports SSE natively, as demonstrated in [ReadableStream for SSE](https://github.com/sveltejs/kit/issues/5344#issuecomment-1266398131) and [Full example](https://github.com/sveltejs/kit/issues/5344#issuecomment-2191106238)
 
 This pattern is already encapsulated by [sveltekit-sse](https://github.com/razshare/sveltekit-sse) library which makes using SSE much easier!
+
+## TODO
+
+1. Make the polling page work.
+2. Replace polling page solution with SSE page
+3. Integrate `sveltekit-sse` library in API
+4. Cleanup
+5. Integrate on other pages
+6. Make it possible to navigate between the pages based on the underlying model.
+
+When a new Project event is received, update an underlying Projects model.
+When a new project is added to the organization, an item should be displayed on the Projects page with info on the project and when clicking on this item, it should open the Project page for that project based on the id (slug) of that project.
+
+For now the following basic model should be the target.
+
+```ts
+class Organization {
+    name: string
+    projects: Record<string, Project>
+    backlog: Backlog
+}
+
+class Project {
+    name: string
+    teams: Record<string, Team>
+
+}
+
+class Team {
+    name: string
+    teams: Record<string, Member>
+    backlog: Backlog
+}
+
+class Member {
+    name: string
+}
+
+class Backlog {
+    features: Record<string, Feature>
+    tasks: Record<string, Task>
+}
+
+...
+```
 
 ## Design
 
