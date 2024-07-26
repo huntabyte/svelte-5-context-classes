@@ -27,15 +27,53 @@ To communicate the messages of the `RedisStore` (in `redis-rune-store.svelte.ts`
 
 ## API
 
-The API includes support for both a polling solution (GET request every 5 secs) and SSEs via ReadableStream.
+The API includes support for both a polling solution (GET request every 5 secs) and SSEs via `ReadableStream`
 
-- `routes/api/messages/+server.ts` - simple GET endpoint that can be used for polling. Subscribes to store and sends messages received back as response
+- `routes/api/messages/+server.ts`
+
+Endpoints:
+
+- `GET` endpoint that can be used for polling. Subscribes to store and sends messages received back as response
+- `POST` endpoint that can be used to update the store with an Application Event
+
+SSE
+
 - `routes/api/sse/+server.ts` - subscribes to store and sends received messages back as a `ReadableStream` (SSE)
+
+## Application Routes
 
 See `routes/projects` folder with examples of client page implementations using both of these approaches.
 
 - `routes/projects/page-sse.svelte` project client page that sets up an `EventSource` to listen to the SSE from the server and handle and display incoming project events
 - `routes/projects/page.svelte` project client page that uses polling to call the GET endpoint every 5 secs to retrieve new project events (messages) to display
+
+## Testing/Mocking
+
+For now a testing library can use the POST endpoint to simulate Application events being created.
+
+```ts
+async function addMessage(message) {
+	const response = await fetch('/api/messages', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ message })
+	});
+
+	const data = await response.json();
+	if (response.ok) {
+		console.log('Message added:', data.message);
+	} else {
+		console.error('Error:', data.error);
+	}
+}
+
+// Usage
+addMessage('Hello, World!');
+```
+
+## Notes on SSE integration
 
 SvelteKit now supports SSE natively, as demonstrated in [ReadableStream for SSE](https://github.com/sveltejs/kit/issues/5344#issuecomment-1266398131) and [Full example](https://github.com/sveltejs/kit/issues/5344#issuecomment-2191106238)
 

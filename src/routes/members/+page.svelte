@@ -1,23 +1,23 @@
 <script lang="ts">
-	import { createMemberStore } from '$lib/server/redis';
+	// import { createMemberStore } from '$lib/server/redis';
 	import { onDestroy } from 'svelte';
 
 	let { channelName } = $props();
 
-	const memberStore = createMemberStore();
+	// const memberStore = createMemberStore();
 
 	let messages = $state<string[]>([]);
 
-	$effect(() => {
-		memberStore.subscribe((value) => {
-			messages = value;
-		});
+	// $effect(() => {
+	// 	memberStore.subscribe((value) => {
+	// 		messages = value;
+	// 	});
 
-		onDestroy(() => {
-			memberStore.reset();
-			memberStore.unsubscribe();
-		});
-	});
+	// 	onDestroy(() => {
+	// 		memberStore.reset();
+	// 		memberStore.unsubscribe();
+	// 	});
+	// });
 </script>
 
 <div>

@@ -16,3 +16,15 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	return json({ messages, channelName });
 };
+
+export const POST: RequestHandler = async ({ request }) => {
+	const { message } = await request.json();
+
+	if (!message) {
+		return json({ error: 'Message content is required' }, { status: 400 });
+	}
+
+	projectStore.add(message);
+
+	return json({ status: 'success', message });
+};
