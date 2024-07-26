@@ -1,6 +1,8 @@
-# create-svelte
+# Ai Dev Team
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+Each page listens to a Redis pubsub powered store. On receiving application events on the channel, the page should update real-time.
+
+Currently `ioredis-mock` is used to substitute a real Redis database with an in-memory mock solution, ideal for testing.
 
 ## Creating a project
 
